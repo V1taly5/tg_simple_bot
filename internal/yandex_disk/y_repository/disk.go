@@ -25,8 +25,7 @@ func NewYandexDisk(client *http.Client, token *Token, baseUrl string) (*YandexDi
 func (d *YandexDisk) GetDisk(ctx context.Context, fields []string) (*Disk, error) {
 	const op = "ydisk/GetDisk"
 	//add checking for zero
-	values := url.Values{}
-	values.Add("fields", strings.Join(fields, ","))
+	values := buildURLValues("fields", strings.Join(fields, ","))
 
 	req, err := d.Client.MakeRequest(http.MethodGet, "/disk?"+values.Encode(), nil)
 
@@ -45,10 +44,10 @@ func (d *YandexDisk) GetDisk(ctx context.Context, fields []string) (*Disk, error
 func (d *YandexDisk) GetResourceUploadLink(ctx context.Context, path string, fields []string, overwrite bool) (*ResourceUploadLink, error) {
 	const op = "ydisk/GetResourceUploadLink"
 
-	values := url.Values{}
-	values.Add("path", path)
-	values.Add("fields", strings.Join(fields, ","))
-	values.Add("overwrite", strconv.FormatBool(overwrite))
+	values := buildURLValues("paht", path,
+		"fields", strings.Join(fields, ","),
+		"overwrite", strconv.FormatBool(overwrite),
+	)
 
 	req, err := d.Client.MakeRequest(http.MethodGet, "/disk/resources/upload?"+values.Encode(), nil)
 	if err != nil {
@@ -65,11 +64,11 @@ func (d *YandexDisk) GetResourceUploadLink(ctx context.Context, path string, fie
 func (d *YandexDisk) UploudExternalResource(ctx context.Context, path string, externalUrl string, disableRedirects bool, fields []string) (*Link, error) {
 	const op = "ydisk/UploudExternalResource"
 
-	values := url.Values{}
-	values.Add("path", path)
-	values.Add("externalUrl", externalUrl)
-	values.Add("disableRedirects", strconv.FormatBool(disableRedirects))
-	values.Add("fields", strings.Join(fields, ","))
+	values := buildURLValues("path", path,
+		"url", externalUrl,
+		"disable_redirects", strconv.FormatBool(disableRedirects),
+		"fields", strings.Join(fields, ","),
+	)
 
 	req, err := d.Client.MakeRequest(http.MethodPost, "/disk/resources/upload?"+values.Encode(), nil)
 	if err != nil {
