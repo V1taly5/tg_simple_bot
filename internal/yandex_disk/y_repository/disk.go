@@ -41,7 +41,13 @@ func (d *YandexDisk) GetDisk(ctx context.Context, fields []string) (*Disk, error
 	return disk, nil
 }
 
-func (d *YandexDisk) GetResourceUploadLink(ctx context.Context, path string, fields []string, overwrite bool) (*ResourceUploadLink, error) {
+func (d *YandexDisk) GetResourceUploadLink(
+	ctx context.Context,
+	path string,
+	fields []string,
+	overwrite bool) (
+	*ResourceUploadLink,
+	error) {
 	const op = "ydisk/GetResourceUploadLink"
 
 	values := buildURLValues("paht", path,
@@ -57,6 +63,9 @@ func (d *YandexDisk) GetResourceUploadLink(ctx context.Context, path string, fie
 	resourceUploadLink := new(ResourceUploadLink)
 
 	_, err = d.Client.GetResponse(ctx, req, &resourceUploadLink)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
 
 	return resourceUploadLink, nil
 }
