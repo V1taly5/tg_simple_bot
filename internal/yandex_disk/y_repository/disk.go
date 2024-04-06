@@ -94,6 +94,40 @@ func (d *YandexDisk) UploudExternalResource(ctx context.Context,
 	}
 	return link, nil
 }
+
+// Получить метаинформацию о файле или каталоге
+func (d *YandexDisk) GetMetaInfoFile(ctx context.Context,
+	path string,
+	fields []string,
+	limit int,
+	offset int,
+	preview_crop bool,
+	preview_size string,
+	sort string) (*Resources, error) {
+	const op = "ydisk/GetMetaInfoFile"
+
+	values := buildURLValues("path", path,
+		"fields", strings.Join(fields, ","),
+		"limit", strconv.Itoa(limit),
+		"offset", strconv.Itoa(offset),
+		"preview_crop", strconv.FormatBool(preview_crop),
+		"preview_size", preview_size,
+		"sort", sort)
+
+	req, err := d.Client.MakeRequest(http.MethodGet, "/disk/resources?"+values.Encode(), nil)
+	if err != nil {
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+
+	resources := new(Resources)
+	_, err = d.Client.GetResponse(ctx, req, &resources)
+
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+	return resources, nil
+}
+
 func buildURLValues(pairs ...string) *url.Values {
 	values := &url.Values{}
 	for i := 0; i < len(pairs); i += 2 {
