@@ -149,6 +149,21 @@ func (e *Error) Error() string {
 	return e.ErrorMSG
 }
 
+func (e *Error) Is(target error) bool {
+	// Проверяем, является ли target экземпляром Error
+	targetErr, ok := target.(*Error)
+	if !ok {
+		return false
+	}
+
+	// Сравниваем поля ошибок
+	if e.Message != targetErr.Message || e.Description != targetErr.Description || e.ErrorMSG != targetErr.ErrorMSG {
+		return false
+	}
+
+	return true
+}
+
 type Params map[string]string
 
 func buildParams(in Params) url.Values {
