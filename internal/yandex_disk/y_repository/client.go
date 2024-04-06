@@ -94,7 +94,7 @@ func (c *Client) GetResponse(ctx context.Context, req *http.Request, obj interfa
 			return responseInfo, fmt.Errorf("%s: %w", op, err)
 		} else if (Error{} != *errorJSON) {
 			// Проверяем пришла ли нам ошибка со стороннего API
-			return responseInfo, fmt.Errorf("%s: %+v", op, errorJSON)
+			return responseInfo, fmt.Errorf("%s: %w", op, errorJSON)
 		}
 		// Если JSON не содержит информации об ошибке, попробуем разобрать в другую структуру (obj)
 		err = json.Unmarshal(body, &obj)
