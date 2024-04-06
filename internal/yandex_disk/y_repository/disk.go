@@ -70,7 +70,11 @@ func (d *YandexDisk) GetResourceUploadLink(
 	return resourceUploadLink, nil
 }
 
-func (d *YandexDisk) UploudExternalResource(ctx context.Context, path string, externalUrl string, disableRedirects bool, fields []string) (*Link, error) {
+func (d *YandexDisk) UploudExternalResource(ctx context.Context,
+	path string,
+	externalUrl string,
+	disableRedirects bool,
+	fields []string) (*Link, error) {
 	const op = "ydisk/UploudExternalResource"
 
 	values := buildURLValues("path", path,
@@ -86,7 +90,7 @@ func (d *YandexDisk) UploudExternalResource(ctx context.Context, path string, ex
 	link := new(Link)
 	_, err = d.Client.GetResponse(ctx, req, &link)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, fmt.Errorf("%s, %w", op, err)
 	}
 	return link, nil
 }
