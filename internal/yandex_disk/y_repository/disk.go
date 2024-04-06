@@ -82,3 +82,14 @@ func (d *YandexDisk) UploudExternalResource(ctx context.Context, path string, ex
 	}
 	return link, nil
 }
+func buildURLValues(pairs ...string) *url.Values {
+	values := &url.Values{}
+	for i := 0; i < len(pairs); i += 2 {
+		key := pairs[i]
+		value := pairs[i+1]
+		if value != "" {
+			values.Add(key, value)
+		}
+	}
+	return values
+}
