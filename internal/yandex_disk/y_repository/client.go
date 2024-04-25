@@ -76,7 +76,7 @@ func (c *client) DoRequset(ctx context.Context, req *http.Request) (*http.Respon
 }
 
 func (c *client) GetResponse(ctx context.Context, req *http.Request, obj interface{}) (*ResponseInfo, error) {
-	const op = "yadisk/GetResponde"
+	const op = "yadisk/GetResponse"
 	resp, err := c.DoRequset(ctx, req)
 	if err != nil {
 		return nil, err
