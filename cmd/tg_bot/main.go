@@ -34,7 +34,7 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
-	App := app.New(bot, cfg.YandexDiskToken, log)
+	App := app.NewApp(bot, cfg.YandexDiskToken, log)
 	App.Run(ctx)
 }
 
