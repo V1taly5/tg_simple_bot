@@ -9,7 +9,7 @@ import (
 
 type YandexDisk struct {
 	Token  *Token
-	Client *Client
+	Client *client
 }
 
 type Share struct {
