@@ -40,7 +40,7 @@ func DocHandl(log *slog.Logger) *mux.Handler {
 	return mux.NewHandler(mux.And(mux.IsMessage(), mux.HasDocument()), handls)
 }
 
-func UploadFileCBHandl(ctx context.Context, log *slog.Logger, usecase *usecase.DiskUseCase) *mux.Handler {
+func UploadFileCBHandl(ctx context.Context, log *slog.Logger, diskUseCase *usecase.DiskUseCase) *mux.Handler {
 	handl := func(u *mux.Update) {
 		log.Info(fmt.Sprintf("got a new update(callback): [from]: %s [subject]: %s", u.CallbackQuery.Message.ReplyToMessage.From.UserName, u.CallbackQuery.Data))
 
@@ -60,13 +60,19 @@ func UploadFileCBHandl(ctx context.Context, log *slog.Logger, usecase *usecase.D
 		}
 
 		// usecase
-		_, err = usecase.UploudFileByURL(ctx, log, pathToSave, fileNameToSave, fileDownloadURL, true, fields)
+		_, err = diskUseCase.UploudFileByURL(ctx, log, pathToSave, fileNameToSave, fileDownloadURL, true, fields)
 		if err != nil {
 			if errors.Is(err, yrepository.ErrResourceNotFound) {
 				msg := tgbotapi.NewMessage(u.CallbackQuery.Message.Chat.ID, "Такого пути не существует")
 				if _, err := u.Bot.Send(msg); err != nil {
 					log.Warn(err.Error())
 				}
+			} else if errors.Is(err, usecase.ErrPathIsEmpty) {
+				msg := tgbotapi.NewMessage(u.CallbackQuery.Message.Chat.ID, "Путь не может быть пустым")
+				if _, err := u.Bot.Send(msg); err != nil {
+					log.Warn(err.Error())
+				}
+
 			}
 			log.Error(err.Error())
 			return
