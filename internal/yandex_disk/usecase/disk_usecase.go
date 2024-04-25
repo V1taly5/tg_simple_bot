@@ -13,6 +13,7 @@ const (
 )
 
 var (
+	ErrPathIsEmpty      = errors.New("path is empty")
 	ErrPathNotDirectory = errors.New("end of the path is not a directory")
 )
 
@@ -35,10 +36,15 @@ func (yr *DiskUseCase) UploudFileByURL(ctx context.Context,
 
 	mas := []string{"type"}
 
+	if pathToSave == "" {
+		log.Debug("path is empty")
+		return nil, fmt.Errorf("%s: %w", op, ErrPathIsEmpty)
+	}
 	res, err := yr.diskRepository.GetMetaInfoFile(ctx, pathToSave, mas, 10, 0, true, "100", "type")
 	if err != nil {
 		if errors.Is(err, yrepository.ErrResourceNotFound) {
 			log.Warn("path not found")
+			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
