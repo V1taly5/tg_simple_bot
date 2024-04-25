@@ -3,6 +3,7 @@ package yrepository
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -53,7 +54,7 @@ func (c *client) MakeRequest(method string, pathUrl string, body io.Reader) (*ht
 
 	c.SetRequestHeaders(req)
 
-	return req, err
+	return req, nil
 }
 
 func (c *client) DoRequset(ctx context.Context, req *http.Request) (*http.Response, error) {
