@@ -45,7 +45,12 @@ func (c *client) SetRequestHeaders(req *http.Request) {
 }
 
 func (c *client) MakeRequest(method string, pathUrl string, body io.Reader) (*http.Request, error) {
-	fullEndPoint := c.baseUrl.ResolveReference(&url.URL{Path: pathUrl})
+	endPoint, err := url.Parse(c.baseUrl.Path + pathUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	fullEndPoint := c.baseUrl.ResolveReference(endPoint)
 
 	req, err := http.NewRequest(method, fullEndPoint.String(), body)
 	if err != nil {
