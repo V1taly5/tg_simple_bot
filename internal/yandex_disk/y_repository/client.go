@@ -11,13 +11,19 @@ import (
 	"os"
 )
 
-type Client struct {
+type client struct {
 	httpClient *http.Client
 	token      *Token
 	baseUrl    *url.URL
 }
 
-func NewClient(token *Token, baseUrl string, httpClient *http.Client) (*Client, error) {
+func NewClient(token *Token, baseUrl string, httpClient *http.Client) (*client, error) {
+	if token == nil || token.AccessToken == "" {
+		return nil, errors.New("required token")
+	}
+	if baseUrl == "" {
+		return nil, errors.New("required baseUrl")
+	}
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
@@ -27,23 +33,18 @@ func NewClient(token *Token, baseUrl string, httpClient *http.Client) (*Client, 
 		return nil, err
 	}
 
-	c := &Client{httpClient: httpClient, token: token, baseUrl: base}
+	c := &client{httpClient: httpClient, token: token, baseUrl: base}
 	return c, nil
 }
 
-func (c *Client) SetRequestHeaders(req *http.Request) {
+func (c *client) SetRequestHeaders(req *http.Request) {
 	req.Header.Add("Access", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", "OAuth "+c.token.AccessToken)
 }
 
-func (c *Client) MakeRequest(method string, pathUrl string, body io.Reader) (*http.Request, error) {
-	endPoint, err := url.Parse(c.baseUrl.Path + pathUrl)
-	if err != nil {
-		return nil, err
-	}
-
-	fullEndPoint := c.baseUrl.ResolveReference(endPoint)
+func (c *client) MakeRequest(method string, pathUrl string, body io.Reader) (*http.Request, error) {
+	fullEndPoint := c.baseUrl.ResolveReference(&url.URL{Path: pathUrl})
 
 	req, err := http.NewRequest(method, fullEndPoint.String(), body)
 	if err != nil {
@@ -55,7 +56,7 @@ func (c *Client) MakeRequest(method string, pathUrl string, body io.Reader) (*ht
 	return req, err
 }
 
-func (c *Client) DoRequset(ctx context.Context, req *http.Request) (*http.Response, error) {
+func (c *client) DoRequset(ctx context.Context, req *http.Request) (*http.Response, error) {
 	resp, err := c.httpClient.Do(req.WithContext(ctx))
 	if err != nil {
 		select {
@@ -68,7 +69,7 @@ func (c *Client) DoRequset(ctx context.Context, req *http.Request) (*http.Respon
 	return resp, err
 }
 
-func (c *Client) GetResponse(ctx context.Context, req *http.Request, obj interface{}) (*ResponseInfo, error) {
+func (c *client) GetResponse(ctx context.Context, req *http.Request, obj interface{}) (*ResponseInfo, error) {
 	const op = "yadisk/GetResponde"
 	resp, err := c.DoRequset(ctx, req)
 	if err != nil {
